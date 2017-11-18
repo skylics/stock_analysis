@@ -1,0 +1,11 @@
+Package: Quantrade
+Type: Package
+Title: Predict how price of specific financial asset will change.
+Version: 0.1.0
+Author: Skylics
+Maintainer: Skylics <skylics@naver.com>
+Description: Analyzing price fluctuation of financial assets using Quant methods.
+License: MIT
+Encoding: UTF-8
+RoxygenNote: 6.0.1
+Imports: rvest, xml2, xts, dplyr, purrr, XML, stringr
