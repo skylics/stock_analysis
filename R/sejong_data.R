@@ -29,19 +29,26 @@ sejong_data <- function(ticker = "total", which_item) {
     tit_code <- tem_code %>% html_nodes('.bus_board_tit1') %>% html_text
     data_code <- data.frame(matrix(dat_code, ncol = 5, byrow = T))[, c(1:2)]
 
-    assign(x = "data_code", value = data_code, envir = .GlobalEnv)
+    if (ticker == "total") {
+      final_data <- data_code
+    } else {
+      final_data <- data_code[which(data_code[, 1] == ticker), ]
+    }
 
   } else {
 
   ##### If you need financial statements, keep going by select proper which_item
 
     ## Which item to be loaded
-    item <- (c("sales", "bp", "np", "asset", "liability", "capital") == which_item) %>% which %>%
-      c("sales", "bp", "np", "asset", "liability", "capital")[.]
+    item <- (c("sales", "bp", "np", "asset", "liability", "capital") == which_item) %>%
+      which %>% c("sales", "bp", "np", "asset", "liability", "capital")[.]
+
+    col_num <- (c("sales", "bp", "np", "asset", "liability", "capital") == which_item) %>%
+      which %>% c(7, 7, 7, 6, 6, 6)[.]
 
 
     ## All stocks statements should be gathered first
-    data_op <- data.frame(matrix(vector(), 0, 7), stringsAsFactors = FALSE)
+    data_op <- data.frame(matrix(vector(), 0, col_num), stringsAsFactors = FALSE)
 
     for (i in 1:5) {
 
@@ -49,24 +56,34 @@ sejong_data <- function(ticker = "total", which_item) {
       tem_op <- read_html(url_op, encoding = "UTF-8")
       dat_op <- tem_op %>% html_nodes(".bus_board_txt1") %>% html_text
       tit_op <- tem_op %>% html_nodes('.bus_board_tit1') %>% html_text
-      data_op <- rbind(data_op, data.frame(matrix(dat_op, ncol = 7, byrow = T)))
+      data_op <- rbind(data_op, data.frame(matrix(dat_op, ncol = col_num, byrow = T)))
 
     }
+
+
+    ## Cleaning more
+    cleaned <- data_op %>% (function(df) {
+
+      if (col_num == 7) {
+        names(df) <- c("code", "name", "T-4", "T-3", "T-2", "T-1", "T")
+      } else if (col_num == 6) {
+        names(df) <- c("code", "name", "T-3", "T-2", "T-1", "T")
+      }
+
+      rownames(df) <- df$name
+      df[, -2]
+    })
+
 
     ## If you want all stocks statements, choose ticker arg as "total"
-
     if (ticker == "total") {
-
-      assign(x = "data_op", value = data_op, envir = .GlobalEnv)
-
+      final_data <- cleaned
     } else {
-
-      data_op %>%
-        (function(df) {
-          rownames(df) <- df$X2
-          names(df) <- c("code", "name", "T-4", "T-3", "T-2", "T-1", "T")
-          df$unit <- "10^8"
-          df[(df$code == ticker), c(1, 3, 4, 5, 6, 7, 8)]})
+        final_data <- cleaned[which(cleaned$code == ticker), ]
     }
+
   }
+
+  final_data
+
 }
