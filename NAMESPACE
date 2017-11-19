@@ -2,6 +2,8 @@
 
 export(book_open)
 export(find_code)
+export(find_code2)
 export(kosd_stock)
 export(kosp_stock)
 export(trade_trend)
+export(sejong_data)
