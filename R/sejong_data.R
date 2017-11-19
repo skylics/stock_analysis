@@ -1,14 +1,14 @@
 #' Get operating profit data in sejong
 #'
 #' @param which_item choose among c("sales", "bp", "np", "asset", "liability", "capital")
-#' @param ticker a ticker code in the format as 000000
+#' @param ticker If specified in the format as 000000, the function returns only a given stock information. If total, the default, returns whole information.
 #'
 #' @return a data frame
 #' @export
 #'
 #' @examples
 #' "stock_name" %>% find_code2 %>% sejong_data("name of statement item")
-sejong_data <- function(ticker, which_item) {
+sejong_data <- function(ticker = "total", which_item) {
 
   ## Package settings
   if (!require("dplyr")) install.packages("dplyr")
@@ -44,12 +44,18 @@ sejong_data <- function(ticker, which_item) {
     data_op <- rbind(data_op, data.frame(matrix(dat_op, ncol = 7, byrow = T)))
   }
 
-  data_op %>%
-    (function(df) {
-      rownames(df) <- df$X2
-      names(df) <- c("code", "name", "T-4", "T-3", "T-2", "T-1", "T")
-      df$unit <- "10^8"
-      df[(df$code == ticker), c(1, 3, 4, 5, 6, 7, 8)]
+  if (ticker == "total") {
 
-      })
+    assign(x = "data_code", value = data_code, envir = .GlobalEnv)
+    assign(x = "data_op", value = data_op, envir = .GlobalEnv)
+
+    } else {
+
+      data_op %>%
+        (function(df) {
+          rownames(df) <- df$X2
+          names(df) <- c("code", "name", "T-4", "T-3", "T-2", "T-1", "T")
+          df$unit <- "10^8"
+          df[(df$code == ticker), c(1, 3, 4, 5, 6, 7, 8)]})
+      }
 }
