@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-#' "롯데하이마트" %>% find_code %>% sejong_data("영업이익")
+#' "stock_name" %>% find_code %>% sejong_data("name of statement item")
 sejong_data <- function(ticker, which_item) {
 
   ## Package settings
@@ -19,7 +19,7 @@ sejong_data <- function(ticker, which_item) {
 
 
   ## which item to be loaded
-  item <- (c("매출액", "영업이익", "순이익", "자산", "부채", "자본") == which_item) %>% which %>%
+  item <- (c("sales", "bp", "np", "asset", "liability", "capital") == which_item) %>% which %>%
     c("sales", "bp", "np", "asset", "liability", "capital")[.]
 
 
@@ -47,9 +47,9 @@ sejong_data <- function(ticker, which_item) {
   data_op %>%
     (function(df) {
       rownames(df) <- df$X2
-      names(df) <- c("코드", "종목", "T-4기", "T-3기", "T-2기", "T-1기", "T기")
-      df$단위 <- "억원"
-      df[(df$코드 == ticker), c(1, 3, 4, 5, 6, 7, 8)]
+      names(df) <- c("code", "name", "T-4", "T-3", "T-2", "T-1", "T")
+      df$unit <- "10^8"
+      df[(df$code == ticker), c(1, 3, 4, 5, 6, 7, 8)]
 
       })
 }
