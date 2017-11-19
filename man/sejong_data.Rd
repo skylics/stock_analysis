@@ -4,12 +4,12 @@
 \alias{sejong_data}
 \title{Get operating profit data in sejong}
 \usage{
-sejong_data(ticker, which_item)
+sejong_data(ticker = "total", which_item)
 }
 \arguments{
-\item{ticker}{a ticker code in the format as 000000}
+\item{ticker}{If specified in the format as 000000, the function returns only a given stock information. If total, the default, returns whole information.}
 
-\item{which_item}{choose among c("sales", "bp", "np", "asset", "liability", "capital")}
+\item{which_item}{choose among c("sales", "bp", "np", "asset", "liability", "capital"). If you want only ticker code, choose "code".}
 }
 \value{
 a data frame
