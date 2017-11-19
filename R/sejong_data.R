@@ -1,13 +1,13 @@
 #' Get operating profit data in sejong
 #'
+#' @param which_item choose among c("sales", "bp", "np", "asset", "liability", "capital")
 #' @param ticker a ticker code in the format as 000000
-#' @param which which Financial statements item to import
 #'
 #' @return a data frame
 #' @export
 #'
 #' @examples
-#' "stock_name" %>% find_code %>% sejong_data("name of statement item")
+#' "stock_name" %>% find_code2 %>% sejong_data("name of statement item")
 sejong_data <- function(ticker, which_item) {
 
   ## Package settings

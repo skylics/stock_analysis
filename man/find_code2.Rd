@@ -13,7 +13,7 @@ find_code2(x)
 character string of specific ticker code.
 }
 \description{
-\code{find_code} returns ticker code from Daum finance when stock name is given.
+\code{find_code2} returns ticker code from Daum finance when stock name is given.
 }
 \examples{
 find_code2("stockname")

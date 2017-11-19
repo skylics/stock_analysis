@@ -9,7 +9,7 @@ sejong_data(ticker, which_item)
 \arguments{
 \item{ticker}{a ticker code in the format as 000000}
 
-\item{which}{which Financial statements item to import}
+\item{which_item}{choose among c("sales", "bp", "np", "asset", "liability", "capital")}
 }
 \value{
 a data frame
@@ -18,5 +18,5 @@ a data frame
 Get operating profit data in sejong
 }
 \examples{
-"stock_name" \%>\% find_code \%>\% sejong_data("name of statement item")
+"stock_name" \%>\% find_code2 \%>\% sejong_data("name of statement item")
 }

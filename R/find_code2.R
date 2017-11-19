@@ -1,6 +1,6 @@
 #' Find ticker code
 #'
-#' \code{find_code} returns ticker code from Daum finance when stock name is given.
+#' \code{find_code2} returns ticker code from Daum finance when stock name is given.
 #'
 #' @param x is a name of the item to find the ticker code.
 #'
