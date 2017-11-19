@@ -87,5 +87,5 @@ kosd_stock <- function(ticker, start_date, end_date){
     start <- as.Date(output[output %>% nrow, 1])
 
   }
-  output %>% (function(df) {xts(df[2:5], order.by = df[, 1])})
+  output %>% (function(df) {xts(df[2:6], order.by = df[, 1])})
 }
