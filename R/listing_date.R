@@ -1,12 +1,13 @@
-#' Title
+#' Find the listing date of given stock
 #'
-#' @param code
+#' @param ticker a ticker code in the format as "000000"
 #'
-#' @return
+#' @return a single date, the stock was listed on the market
 #' @export
 #'
 #' @examples
-listing_date <- function(code) {
+#' "stock name" %>% find_code2 %>% listing_date
+listing_date <- function(ticker) {
   url_code <- paste("http://wisefn.stock.daum.net/company/c1020001.aspx?cmp_cd=", code, "&frq=&rpt=", sep = "")
   tem_code <- read_html(url_code, encoding = "UTF-8")
   text <- tem_code %>% html_nodes("td") %>% html_text()
