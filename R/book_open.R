@@ -39,12 +39,15 @@ book_open <- function(ticker) {
   data <- t(data)
 
   for (i in 1:15) {
-    data[, i] <-
-      sejongdata[((tmp[i] + 1):(tmp[i] + 1 + 9)), ] %>% as.vector %>% stringr::str_replace(",", "") %>% as.numeric %>%
-      iconv(to = "UTF-8") %>% (function(df) {df[is.na(df)] <- ""; df})
+    data[, i] <- sejongdata[((tmp[i] + 1):(tmp[i] + 1 + 9)), ] %>% as.vector %>%
+      stringr::str_replace(",", "") %>% iconv(to = "UTF-8") %>% as.numeric %>%  (function(df) {df[is.na(df)] <- ""; df})
   }
 
   data <- t(data)
   data <- data %>% as.data.frame
   data
 }
+
+# c(15) %>% map(function(i) {
+#   sejongdata[((tmp[i] + 1):(tmp[i] + 1 + 9)), ] %>% as.vector %>% stringr::str_replace(",", "") %>% iconv(to = "UTF-8") %>% as.numeric
+# })
