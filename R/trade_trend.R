@@ -33,7 +33,8 @@ trade_trend <- function(ticker, from) {
     volumn_table <- rbind(volumn_table, table)
   }
 
-  final_table <- volumn_table %>% (function(df) {(df$date >= from) %>% df[., ]})
+  final_table <- volumn_table %>% (function(df) {df %>% complete.cases %>% df[., ]}) %>%
+    (function(df2) {(df2$date >= from) %>% df2[., ]})
   final_table[, c(2, 4, 5)] <- final_table[, c(2, 4, 5)] %>%
     apply(2, function(df) {df %>% stringr::str_replace_all(",", "") %>% as.numeric})
   final_table[, 3] <- (final_table[, 3] %>% as.character %>% str_replace_all("%", "") %>% str_replace_all(fixed("."), "") %>% as.numeric)/10000
