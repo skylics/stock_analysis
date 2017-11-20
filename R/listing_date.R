@@ -8,7 +8,10 @@
 #' @examples
 #' "stock name" %>% find_code2 %>% listing_date
 listing_date <- function(ticker) {
-  url_code <- paste("http://wisefn.stock.daum.net/company/c1020001.aspx?cmp_cd=", code, "&frq=&rpt=", sep = "")
+
+  library(rebus, quietly = TRUE)
+
+  url_code <- paste("http://wisefn.stock.daum.net/company/c1020001.aspx?cmp_cd=", ticker, "&frq=&rpt=", sep = "")
   tem_code <- read_html(url_code, encoding = "UTF-8")
   text <- tem_code %>% html_nodes("td") %>% html_text()
   text_clean <- text %>% stringr::str_detect("상장일") %>% text[.] %>%

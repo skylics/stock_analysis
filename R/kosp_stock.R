@@ -11,7 +11,7 @@
 #'
 #' @examples
 #' kosp_stock("011000", "2011-01-01")
-kosp_stock <- (function(code, from) {
-  df <- code %>% paste("KRX:", ., sep = "") %>% quantmod::getSymbols(from = from, src = "google", auto.assign = FALSE)
+kosp_stock <- (function(ticker, from) {
+  df <- ticker %>% paste("KRX:", ., sep = "") %>% quantmod::getSymbols(from = from, src = "google", auto.assign = FALSE)
   df
 })

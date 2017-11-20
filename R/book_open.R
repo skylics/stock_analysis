@@ -2,16 +2,18 @@
 #'
 #' \code{book_open} returns major accounting book data
 
-#' @param code a ticker code in the format as "000000" (use find_code())
+#' @param ticker a ticker code in the format as "000000" (use find_code())
 #'
 #' @return a data frame
 #' @export
 #'
 #' @examples
 #' find_code("stockname") %>% book_open
-book_open <- function(code) {
+book_open <- function(ticker) {
 
-  url <- paste("http://www.sejongdata.com/business_include_fr/table_main0_bus_01.html?&no=", code, sep = "")
+  library(rebus, quietly = TRUE)
+
+  url <- paste("http://www.sejongdata.com/business_include_fr/table_main0_bus_01.html?&no=", ticker, sep = "")
 
   html_sejong <- xml2::read_html(url, encoding = "UTF-8")
 
@@ -23,17 +25,23 @@ book_open <- function(code) {
   data <- matrix(data = NA, nrow = 15, ncol = 10)
 
   ## column name / row name
-  colnames(data) <- as.vector(date[2:11, ])
+  colnames(data) <- as.vector(date[2:11, ]) %>%
+    str_match(capture(one_or_more(DGT) %R% "." %R% one_or_more(DGT)) %R%
+                one_or_more(SPC) %R%
+                capture("\\(" %R% one_or_more(WRD)) %R%
+                one_or_more(SPC) %R%
+                capture(one_or_more(WRD) %R% "\\)")) %>% (function(df) {paste(df[, 2], df[, 3], df[, 4], sep = " ")})
+
   tmp <- c(1, 12, 23, 34, 45, 56, 67, 78, 89, 100, 111, 122, 133, 144, 155)
   rownames(data) <- as.vector(sejongdata[tmp, 1])
 
   ## transpose
   data <- t(data)
 
-  for(i in 1:15) {
+  for (i in 1:15) {
     data[, i] <-
-      sejongdata[((tmp[i] + 1):(tmp[i] + 1 + 9)), ] %>% as.vector %>% sub(",", "", .) %>% as.numeric %>%
-      (function(df) {df[is.na(df)] <- ""; df})
+      sejongdata[((tmp[i] + 1):(tmp[i] + 1 + 9)), ] %>% as.vector %>% stringr::str_replace(",", "") %>% as.numeric %>%
+      iconv(to = "UTF-8") %>% (function(df) {df[is.na(df)] <- ""; df})
   }
 
   data <- t(data)
