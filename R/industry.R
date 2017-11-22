@@ -1,0 +1,29 @@
+#' Searching which industry the company belongs to
+#'
+#' @param ticker a ticker code in the format as "000000"
+#'
+#' @return Industry / WICS
+#' @export
+#'
+#' @examples
+#' "stock name" %>% find_code3 %>% industry
+industry <- function(ticker) {
+
+
+  library("stringr", quietly = TRUE)
+  library("dplyr", quietly = TRUE)
+  library("rebus", quietly = TRUE)
+
+
+  url_code <- paste("http://companyinfo.stock.naver.com/v1/company/c1020001.aspx?cmp_cd=", ticker, "&cn=", sep = "")
+  tem_code <- read_html(url_code, encoding = "UTF-8")
+
+  industry <- tem_code %>% html_nodes(".wrapper-table") %>% html_nodes("table") %>% html_nodes("tr") %>%
+    .[1] %>% html_nodes("dt") %>% html_text %>% .[3] %>% str_match(": " %R% capture(one_or_more(NOT_SPC))) %>% .[2]
+
+  WICS <- tem_code %>% html_nodes(".wrapper-table") %>% html_nodes("table") %>% html_nodes("tr") %>%
+    .[1] %>% html_nodes("dt") %>% html_text %>% .[4] %>% str_match(": " %R% capture(one_or_more(NOT_SPC))) %>% .[2]
+  # WISEfn Industry Classification Standard, modified by WISEfn
+
+}
+

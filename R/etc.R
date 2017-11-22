@@ -9,7 +9,11 @@
 #' "stock name" %>% find_code2 %>% D_or_P
 book_open2 <- function(ticker) {
 
-  library("stringr")
+
+  library("stringr", quietly = TRUE)
+  library("dplyr", quietly = TRUE)
+  library("rebus", quietly = TRUE)
+
 
   url_code <- paste("http://companyinfo.stock.naver.com/v1/company/c1020001.aspx?cmp_cd=", ticker, "&cn=", sep = "")
   tem_code <- read_html(url_code, encoding = "UTF-8")
