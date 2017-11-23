@@ -9,8 +9,6 @@
 #' "stock name" %>% find_code2 %>% D_or_P
 book_open2 <- function(ticker) {
 
-  http://companyinfo.stock.naver.com/v1/company/c1010001.aspx?cmp_cd=071840&target=finsum_more
-
   url_code <- paste("http://companyinfo.stock.naver.com/v1/company/c1010001.aspx?cmp_cd=", ticker, "&target=finsum_more", sep = "")
   tem_code <- read_html(url_code, encoding = "UTF-8")
 
@@ -49,4 +47,3 @@ book_open2 <- function(ticker) {
 
 
 }
-
