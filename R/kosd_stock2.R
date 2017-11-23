@@ -37,7 +37,7 @@ kosd_stock2 <- function(ticker, start_date, end_date) {
       raw <- (anchor[num] + 1):(anchor[num + 1] - 1) %>% text_code[.]
 
       ## Get data cleaned
-      raw %>% str_detect(START %R% one_or_more(DGT) %R% optional(",") %R% one_or_more(DGT) %R% END) %>% raw[.] %>%
+      raw %>% str_detect(START %R% one_or_more(DGT) %R% optional(",") %R% zero_or_more(DGT)) %>% raw[.] %>%
         str_replace_all(",", "") %>% as.numeric %>% as.data.frame(stringsAsFactor = FALSE) %>% t %>%
         (function(df) {
           colnames(df) <- c("Close", "Open", "High", "Low", "Volumn")
