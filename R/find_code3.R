@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' find_code3("stockname")
-find_code3 <- function(x) {
+find_code3 <- function(ticker) {
 
 
   ## Package settings
@@ -30,3 +30,4 @@ find_code3 <- function(x) {
 }
 
 
+"아이이" %>% find_code3

@@ -10,6 +10,7 @@
 real_time <- function(ticker) {
 
   library(rebus, quietly = TRUE)
+  library(rvest, quietly = TRUE)
 
   url_code <- paste("http://finance.daum.net/item/quote.daum?code=", ticker, sep = "")
   tem_code <- read_html(url_code, encoding = "UTF-8")
@@ -19,7 +20,8 @@ real_time <- function(ticker) {
       data.frame("Open" = df[which(df == "시가") + 1] %>% stringr::str_replace_all(",", "") %>% as.numeric,
                  "High" = df[which(df == "고가") + 1] %>% stringr::str_replace_all(",", "") %>% as.numeric,
                  "Low" = df[which(df == "저가") + 1] %>% stringr::str_replace_all(",", "") %>% as.numeric,
-                 "Close" = df[which(df == "현재가") + 1] %>% stringr::str_replace_all(",", "") %>% as.numeric
+                 "Close" = df[which(df == "현재가") + 1] %>% stringr::str_replace_all(",", "") %>% as.numeric,
+                 "Volumn" = df[which(df == "거래량") + 1] %>% stringr::str_replace_all(",", "") %>% as.numeric
                  ) %>% xts::xts(order.by = Sys.Date())
       })
 
