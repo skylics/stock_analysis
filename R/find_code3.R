@@ -28,6 +28,3 @@ find_code3 <- function(ticker) {
 
   ticker
 }
-
-
-"아이이" %>% find_code3
