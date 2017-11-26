@@ -9,9 +9,6 @@
 #'
 #' @return predefined form of graph
 #' @export
-#'
-#' @examples
-#' plotfn(trade_data, date, y_plot[i])
 plotfn <- function(data, xvar, yvar, which_geom, legend_nm, what_unit) {
 
   library(ggplot2, quietly = TRUE)
@@ -30,7 +27,7 @@ plotfn <- function(data, xvar, yvar, which_geom, legend_nm, what_unit) {
   )
 
   ggplot(data = as.data.frame(data_gd),
-         mapping = aes(x = xvar, y = yvar, lty = legend_name)
+         mapping = aes(x = xvar, y = yvar, lty = legend_nm)
   ) +
     eval(parse(text = which_geom)) +
     scale_x_date(date_breaks = "1 month", date_labels = "%y/%m/%d") +
