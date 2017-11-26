@@ -8,7 +8,7 @@
 #'
 #' @return a multiplot
 #' @export
-multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
+multi_plot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
 
   library(grid, quietly = TRUE)
 

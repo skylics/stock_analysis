@@ -9,7 +9,7 @@
 #'
 #' @return predefined form of graph
 #' @export
-plotfn <- function(data, xvar, yvar, which_geom, legend_nm, what_unit) {
+plot_trade <- function(data, xvar, yvar, which_geom, legend_nm, what_unit) {
 
   library(ggplot2, quietly = TRUE)
   library(lazyeval, quietly = TRUE)
