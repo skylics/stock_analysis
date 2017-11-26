@@ -11,6 +11,9 @@
 #' plotfn(trade_data, date, y_plot[i])
 plotfn <- function(data, xvar, yvar) {
 
+  library(ggplot2, quietly = TRUE)
+  library(lazyeval, quietly = TRUE)
+
   data_gd <- NULL
 
   data_gd$xvar <- tryCatch(

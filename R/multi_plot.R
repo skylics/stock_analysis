@@ -6,12 +6,12 @@
 #' @examples
 #' multiplot(p_1, p_2, p_3, p_4, cols = 2)
 multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
-  library(grid)
+
+  library(grid, quietly = TRUE)
 
   # Make a list from the ... arguments and plotlist
   plots <- c(list(...), plotlist)
-
-  numPlots = length(plots)
+  numPlots <- length(plots)
 
   # If layout is NULL, then use 'cols' to determine layout
   if (is.null(layout)) {
@@ -22,7 +22,7 @@ multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
                      ncol = cols, nrow = ceiling(numPlots/cols))
   }
 
-  if (numPlots==1) {
+  if (numPlots == 1) {
     print(plots[[1]])
 
   } else {
