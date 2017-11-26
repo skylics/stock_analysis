@@ -1,5 +1,11 @@
 #' Create multi ggplot graphes (code origin - http://www.cookbook-r.com/Graphs)
 #'
+#' @param ...
+#' @param plotlist
+#' @param file
+#' @param cols
+#' @param layout
+#'
 #' @return a multiplot
 #' @export
 #'
