@@ -27,7 +27,7 @@ given_plot <- function(data, xvar, yvar, which_geom, legend_nm, what_unit) {
   )
 
   ggplot(data = as.data.frame(data_gd),
-         mapping = aes(x = xvar, y = yvar, lty = legend_nm)
+         mapping = aes(x = xvar, y = yvar)
   ) +
     eval(parse(text = which_geom)) +
     scale_x_date(date_breaks = "1 month", date_labels = "%y/%m/%d") +
@@ -43,5 +43,11 @@ given_plot <- function(data, xvar, yvar, which_geom, legend_nm, what_unit) {
              x = min(data_gd$xvar),
              y = max(data_gd$yvar),
              hjust = 0.1,
-             label = what_unit)
+             vjust = 2,
+             label = what_unit) +
+    annotate("text",
+             x = min(data_gd$xvar),
+             y = max(data_gd$yvar),
+             hjust = 0.1,
+             label = legend_nm)
 }
