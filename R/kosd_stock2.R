@@ -11,8 +11,7 @@
 #'
 #' @examples
 #' kosd_stock2("011000", "2014-01-01", "2017-09-22")
-kosd_stock2 <- function(ticker, start_date, end_date) {
-
+kosd_stock2 <- function (ticker, start_date, end_date) {
 
   library(dplyr, quietly = TRUE)
   library(rvest, quietly = TRUE)
@@ -20,8 +19,6 @@ kosd_stock2 <- function(ticker, start_date, end_date) {
   library(rebus, quietly = TRUE)
   library(purrr, quietly = TRUE)
 
-
-  ##### Create scrapping function when is given
   scrap_page <- function(i) {
 
     url_code <- paste("http://finance.naver.com/item/sise_day.nhn?code=", ticker, "&page=", i, sep = "")
@@ -29,39 +26,30 @@ kosd_stock2 <- function(ticker, start_date, end_date) {
     text_code <- tem_code %>% html_node("body") %>% html_node("table") %>% html_nodes("td") %>% html_text
     place_date <- text_code %>% str_detect(dgt(4) %R% "." %R% dgt(2) %R% "." %R% dgt(2)) %>% which()
 
-    ##### Scrapping web page
-    scrap <- 1:length(place_date) %>% map(function(num) {
+    c(1:length(place_date)) %>% map_df(function(num) {
 
-      ## See which should be extracted
       anchor <- c(place_date, length(text_code) + 1)
       raw <- (anchor[num] + 1):(anchor[num + 1] - 1) %>% text_code[.]
+      cleaned <- raw %>% str_detect(START %R% one_or_more(DGT) %R% optional(",") %R% zero_or_more(DGT)) %>%
+        raw[.] %>% str_replace_all(",", "") %>% as.numeric
 
-      ## Get data cleaned
-      raw %>% str_detect(START %R% one_or_more(DGT) %R% optional(",") %R% zero_or_more(DGT)) %>% raw[.] %>%
-        str_replace_all(",", "") %>% as.numeric %>% as.data.frame(stringsAsFactor = FALSE) %>% t %>%
-        (function(df) {
-          colnames(df) <- c("Close", "Open", "High", "Low", "Volumn")
-          df %>% xts(order.by = place_date[num] %>% text_code[.] %>% str_replace_all(fixed("."), "-") %>% as.Date)
-        })
-    }) %>% do.call(rbind, .)
+      cleaned %>% t %>% as.data.frame %>% (function(df) {
+        colnames(df) <- c("Close", "Open", "High", "Low", "Volumn")
+        rownames(df) <- num
+        df$date <- place_date[num] %>% text_code[.] %>% str_replace_all(fixed("."), "-") %>% as.Date
+        df})
+
+    }) %>% (function(df) {xts(df[, -6] %>% apply(2, as.numeric), order.by = df$date)})
   }
 
-
-  ##### Initial Scrap for (i = 1)
   i <- 1
   scrap <- scrap_page(i)
 
-
-  ##### Loop until
   while (scrap %>% index %>% first > start_date) {
     i <- i + 1
     scrap <- rbind(scrap, scrap_page(i))
   }
 
-
-  ##### Final cleaning
   final_data <- scrap[(scrap %>% index >= start_date) & (scrap %>% index <= end_date), ]
-
   final_data
-
 }
