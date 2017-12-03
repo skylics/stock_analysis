@@ -18,6 +18,7 @@ kosd_stock2 <- function (ticker, start_date, end_date) {
   library(stringr, quietly = TRUE)
   library(rebus, quietly = TRUE)
   library(purrr, quietly = TRUE)
+  library(xts, quietly = TRUE)
 
   scrap_page <- function(i) {
 
@@ -39,7 +40,14 @@ kosd_stock2 <- function (ticker, start_date, end_date) {
         df$date <- place_date[num] %>% text_code[.] %>% str_replace_all(fixed("."), "-") %>% as.Date
         df})
 
-    }) %>% (function(df) {xts(df[, -6] %>% apply(2, as.numeric), order.by = df$date)})
+    }) %>% (function(df) {
+
+      if(nrow(df) == 1) {
+        xts(df[, -6] %>% apply(2, as.numeric) %>% t %>% as.data.frame(stringsAsFactors = TRUE), order.by = df$date)
+      } else {
+        xts(df[, -6] %>% apply(2, as.numeric), order.by = df$date)
+      }
+    })
   }
 
   i <- 1
