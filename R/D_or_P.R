@@ -19,3 +19,4 @@ D_or_P <- function(ticker) {
   }
   output
 }
+
