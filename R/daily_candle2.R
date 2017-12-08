@@ -14,14 +14,14 @@ library(htmlwidgets)
 
 ## 데이터 load
 setwd("P:/LICS/Rwd/Stock_analysis/data")
-setwd("C:/Users/user/Desktop/R project/Github/Stock_analysis/data")
+#setwd("C:/Users/user/Desktop/R project/Github/Stock_analysis/data")
 load("all_stocks.rda")
 
 
 ## INPUT data - X 생성
 all_stocks$code %>% as.data.frame(stringsAsFactors = FALSE) ->.;
-#.[c(1:nrow(.)), ] -> datax
-.[c(1:10), ] -> datax
+.[c(1:nrow(.)), ] -> datax
+#.[c(1:100), ] -> datax
 
 
 ## INDEX data - z 생성
@@ -58,7 +58,7 @@ wrapper <- function(datax, dataz) {
     code_part <- datax[dataz == zlevel]
 
 
-    ###3### Function body
+    ###3### Function body - real_time()
     real_time <- function(ticker) {
 
       ticker ->.;
@@ -69,24 +69,74 @@ wrapper <- function(datax, dataz) {
       html_nodes(., ".leftDiv") ->.;
       html_nodes(., "td") ->.;
       html_text(.) %>%
-        (function(df) {c("시가", "고가", "저가", "현재가") %>%
+        (function(df) {c("시가", "고가", "저가", "현재가", "거래량") %>%
             purrr::map(function(char) {
               char ->.; df[which(df == .) + 1] ->.; stringr::str_replace_all(., ",", "") ->.; as.numeric(.)
-            }) ->.;
-          unlist(.) ->.; scale(.) ->.;
-          c(., df[which(df == "거래량") + 1] %>% stringr::str_replace_all(",", "") %>% as.numeric)
-        }) %>% as.data.frame %>% t %>% {colnames(.) <- c("Open", "High", "Low", "Close", "deal_done"); .} %>%
-        {rownames(.) <- ticker; .}
-    }
+            })
+        }) ->.;
+      unlist(.) ->.;
+      c(ticker, .)
+
+    } ###3### Last line of real_time()
+
+
+    ###3### Function body - scale_cluster
+    make_scale <- function(df) {
+
+      df[2:5] -> .
+      as.numeric(.) ->.;
+      log(.) ->.;
+
+      if (sum(is.infinite(.)) > 0) {
+        c(0, 0, 0, 0) ->.;
+        c(df[1], ., df[6]) ->.;
+
+      } else if (sum(is.na(.)) > 0) {
+        c(0, 0, 0, 0) ->.;
+        c(paste(df[1], "_X", sep = ""), ., df[6]) ->.;
+
+      } else if (sum(is.infinite(.)) == 0) {
+        (. - .[1]) ->.;
+        c(df[1], ., df[6]) ->.;
+      }
+
+      as.data.frame(., stringsAsFactors = FALSE) ->.;
+      t(.) ->.;
+      {colnames(.) <- c("code", "Open", "High", "Low", "Close", "done_Q"); .} ->.;
+      .
+
+    } ###3### Last line of scale_cluster()
+
+
+    ###3### Function body - scale_kmeans
+    scale_kmeans <- function(df, k) {
+
+      unlist(df, recursive = TRUE) ->.;
+      matrix(., ncol = 6, byrow = TRUE) -> df2
+
+      df2[, c(2:5)] ->.;
+      stats::kmeans(., centers = k, iter.max = 100, nstart = k) ->.;
+
+      cbind(df2[, c(2:5)], .$cluster, df2[, 6]) ->.;
+      {colnames(.) <- c("Open", "High", "Low", "Close", "cluster", "done_Q"); .} ->.;
+      apply(., 2, as.numeric) %>% as.data.frame(stringsAsFactors = FALSE) ->.;
+      {.$cluster <- factor(.$cluster); .} ->.;
+      {rownames(.) <- df2[, 1]; .} ->.;
+      .
+
+    } ###3### Last line of scale_cluster()
 
 
     ###3### Activate the function with loop using map()
     code_part ->.;
     purrr::map(., function(ticker) {
 
-      real_time(ticker)
+      real_time(ticker) ->.;
+      make_scale(.)
 
-    }) ###3### Last line of code_part
+    }) ->.; ###3### Last line of code_part
+
+    scale_kmeans(., 2)
 
   } ###2### Last line of Activation function()
 
@@ -116,7 +166,9 @@ toc()
 ##############################
 ############### 저장하기
 
-df <- models %>% rlist::list.flatten() %>% do.call(rbind, .) %>% as.data.frame %>%
+models %>% purrr::map(function(df) {
+  df %>% tibble::rownames_to_column("code")
+}) %>% rlist::list.flatten() %>% do.call(cbind, .) %>% as.data.frame %>%
   tibble::rownames_to_column("code") %>% (function(df) {df$num <- c(1:nrow(df)); df})
 
 k <- 8
