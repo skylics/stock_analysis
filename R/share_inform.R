@@ -11,6 +11,7 @@ share_inform <- function(ticker) {
 
   library(rebus, quietly = TRUE)
   library(wrapr, quietly = TRUE)
+  library(rvest, quietly = TRUE)
 
 
   ## Total shares
