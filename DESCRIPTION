@@ -8,4 +8,4 @@ Description: Analyzing price fluctuation of financial assets using Quant methods
 License: MIT
 Encoding: UTF-8
 RoxygenNote: 6.0.1
-Imports: rvest, xml2, xts, dplyr, purrr, XML, stringr, rebus, ggplot2, lazyeval, grid
+Imports: rvest, xml2, xts, dplyr, purrr, XML, stringr, rebus, ggplot2, lazyeval, grid, tictoc
