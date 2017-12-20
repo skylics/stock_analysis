@@ -3,6 +3,7 @@ library(parallel)
 library(tictoc)
 library(profvis)
 library(htmlwidgets)
+library(rebus)
 
 
 ##############################
@@ -13,8 +14,8 @@ library(htmlwidgets)
 
 
 ## 데이터 load
-#setwd("P:/LICS/Rwd/Stock_analysis/data")
-setwd("C:/Users/user/Desktop/R project/Github/Stock_analysis/data")
+setwd("P:/LICS/Rwd/Stock_analysis/data")
+#setwd("C:/Users/user/Desktop/R project/Github/Stock_analysis/data")
 load("all_stocks.rda")
 all_stocks %>% str
 
@@ -22,7 +23,7 @@ all_stocks %>% str
 ## INPUT data - X 생성
 all_stocks$code %>% as.data.frame(stringsAsFactors = FALSE) ->.;
 #.[c(500:600), ] -> datax
-.[c(1:nrow(.)), ] -> data
+.[c(1:nrow(.)), ] -> datax
 #code_part -> dataxx
 
 
@@ -85,7 +86,7 @@ wrapper <- function(datax, dataz) {
 
 
         ###5### Scrape
-        paste0("http://finance.daum.net/item/quote_yyyymmdd_sub.daum?page=1&code=",
+        paste0("http://finance.daum.net/item/quote_yyyymmdd_sub.daum?page=", i, "&code=",
                ticker, "&modify=1") ->.;
         xml2::read_html(.) ->.;
         rvest::html_node(., "body") ->.;
@@ -100,29 +101,22 @@ wrapper <- function(datax, dataz) {
         c(1:length(place_date)) ->.;
 
         purrr::map_df(., function(num) {
-          #.
-          num <- 4
+
           place_date[num] ->.;
           text_code[.] ->.;
-          stringr::str_split(., SPC)
-          stringr::str_extract_all(., NOT_SPC) ->.;
-          .[[1]] -> .
-          paste(., collapse =)
-
-          stringr::str_c(.)
-          stringr::str_replace_all(., " ", "") ->.;
-
+          stringr::str_replace_all(., "\\n" , "") ->.;
+          stringr::str_replace_all(., "\\t" , " ") ->.;
           stringr::str_match(., START %R%
-                               capture(one_or_more(NOT_SPC)) %R% "\n\t\t\t\t" %R%
-                               capture(one_or_more(DGT) %R% one_or_more(NOT_SPC)) %R% "\n\t\t\t\t" %R%
-                               capture(one_or_more(DGT) %R% one_or_more(NOT_SPC)) %R% "\n\t\t\t\t" %R%
-                               capture(one_or_more(DGT) %R% one_or_more(NOT_SPC)) %R% "\n\t\t\t\t" %R%
-                               capture(one_or_more(DGT) %R% one_or_more(NOT_SPC)) %R% "\n\t\t\t\t" %R%
-                               one_or_more(NOT_SPC) %R% "\n\t\t\t\t" %R%
-                               one_or_more(NOT_SPC) %R% "%" %R% "\n\t\t\t\t" %R%
-                               capture(one_or_more(DGT) %R% zero_or_more(NOT_SPC)) %R% "\n") ->.;
-
-          .[-1] -> df
+                               capture(one_or_more(NOT_SPC)) %R% one_or_more(SPC) %R%
+                               capture(one_or_more(NOT_SPC)) %R% one_or_more(SPC) %R%
+                               capture(one_or_more(NOT_SPC)) %R% one_or_more(SPC) %R%
+                               capture(one_or_more(NOT_SPC)) %R% one_or_more(SPC) %R%
+                               capture(one_or_more(NOT_SPC)) %R% one_or_more(SPC) %R%
+                               one_or_more(NOT_SPC) %R% one_or_more(SPC) %R%
+                               one_or_more(NOT_SPC) %R% one_or_more(SPC) %R%
+                               capture(one_or_more(NOT_SPC)) %R% zero_or_more(SPC) %R% END
+                             ) ->.;
+          .[, -1] -> df
           stringr::str_replace_all(df[-1], ",", "") ->.;
           as.numeric(.) ->.;
           t(.) ->.;
@@ -166,7 +160,7 @@ wrapper <- function(datax, dataz) {
 
 
     ###3### Do Map iteration
-    from <- "2017-12-07"
+    from <- "2017-12-13"
     today <- Sys.Date()
 
     code_part ->.;
@@ -178,9 +172,9 @@ wrapper <- function(datax, dataz) {
       zoo::as.Date(.) -> price_from
 
       ticker ->.;
-      kosd_safe <- purrr::safely(kosd_stock2)
-      kosd_safe(., price_from, today)
-      #kosd_stock2(., price_from, today)
+      #kosd_safe <- purrr::safely(kosd_stock2)
+      #kosd_safe(., price_from, today)
+      kosd_stock2(., price_from, today)
     }) ###3### Last line of code_part
 
     #result %>% purrr::map(function(df) {df$error})
@@ -210,32 +204,3 @@ toc()
 
 parallel::stopCluster(parallelcluster)
 toc()
-
-
-1 %>% purrr::map(function(num) {models[[num]] %>%
-    purrr::map(function(df) {ifelse(is.null(df$error), 0, 1)}) %>% unlist}) %>% unlist %>%
-  as.logical %>% which -> errors
-
-i <- 1
-ticker <- datax[dataz == 1][errors[1]]
-
-
-
-##############################
-############### 프로파일링 - profvis 패키지 활용
-
-model_profvis <- profvis({
-
-  parallelcluster <- parallel::makeCluster(parallel::detectCores())
-
-  models <- parallel::parLapply(parallelcluster, zlevels, wrapper(datax, dataz))
-
-  parallel::stopCluster(parallelcluster)
-
-  })
-
-saveWidget(widget = model_profvis, file = "model_profvis.html")
-getwd()
-
-
-
